@@ -8,7 +8,8 @@ export class BucketCdkStack extends core.Stack {
         const bucket = new s3.Bucket(this, 'WebUIBucket', {
             versioned: true,
             websiteIndexDocument: 'index.html',
-            websiteErrorDocument: 'index.html'
+            websiteErrorDocument: 'index.html',
+            publicReadAccess: true
         })
     }
 }

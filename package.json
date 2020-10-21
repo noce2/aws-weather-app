@@ -1,0 +1,22 @@
+{
+  "name": "aws-weather-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noce2/aws-weather-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noce2/aws-weather-app/issues"
+  },
+  "homepage": "https://github.com/noce2/aws-weather-app#readme",
+  "devDependencies": {
+    "@angular/cli": "^10.1.7"
+  }
+}

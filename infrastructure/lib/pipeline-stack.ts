@@ -2,7 +2,10 @@ import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as lambda from '@aws-cdk/aws-lambda';
-import { App, Stack, StackProps, SecretValue } from '@aws-cdk/core';
+import * as kms from '@aws-cdk/aws-kms';
+import * as s3 from '@aws-cdk/aws-s3';
+import { App, Stack, StackProps, SecretValue, RemovalPolicy } from '@aws-cdk/core';
+import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -12,6 +15,40 @@ export interface PipelineStackProps extends StackProps {
 export class PipelineStack extends Stack {
   constructor(app: App, id: string, props: PipelineStackProps) {
     super(app, id, props);
+
+    const keyPolicy = new PolicyStatement({
+      sid: 'allow user access to update key policies',
+      effect: Effect.ALLOW,
+      resources: ["*"],
+      actions: [
+        "kms:Create*",
+        "kms:Describe*",
+        "kms:Enable*",
+        "kms:List*",
+        "kms:Put*",
+        "kms:Update*",
+        "kms:Revoke*",
+        "kms:Disable*",
+        "kms:Get*",
+        "kms:Delete*",
+        "kms:TagResource",
+        "kms:UntagResource",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion"
+      ]
+    })
+    keyPolicy.addArnPrincipal('arn:aws:iam::892799438830:user/noce2-dev')
+
+    const key = new kms.Key(this, 'CustomPipelineArtifactsBucketKey', {
+      removalPolicy: RemovalPolicy.DESTROY
+    });
+
+    key.addToResourcePolicy(keyPolicy)
+
+    const pipelineArtifactsBucket = new s3.Bucket(this, 'PipelineArtifactsBucket', {
+      encryptionKey: key,
+      removalPolicy: RemovalPolicy.DESTROY
+    })
 
     const cdkBuild = new codebuild.PipelineProject(this, 'CdkBuild', {
       buildSpec: codebuild.BuildSpec.fromObject({
@@ -123,6 +160,7 @@ export class PipelineStack extends Stack {
           ],
         },
       ],
+      artifactBucket: pipelineArtifactsBucket
     });
   }
 }

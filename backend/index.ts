@@ -1,7 +1,12 @@
+import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult, Callback, Context } from "aws-lambda";
+
 // index.ts
 const GREETING = "Hello, AWS!";
 
-export async function main(event: any, context: any) {
+export const main: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>) => {
   console.log(GREETING);
-  return GREETING;
+  return {
+    statusCode: 200,
+    body: GREETING
+  };
 }

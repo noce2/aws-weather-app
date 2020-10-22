@@ -79,14 +79,14 @@ export class PipelineStack extends Stack {
             new codepipeline_actions.GitHubSourceAction({
                 branch: 'main',
                 owner: 'noce2',
-                repo: 'aws-weather-app',
+                repo: props.repoName,
                 oauthToken: SecretValue.secretsManager(
                     'arn:aws:secretsmanager:eu-west-2:892799438830:secret:prod/aws-weather-app/github-nYjmSc',
                     {jsonField: 'github-access-token'}
                     ),
                 trigger: codepipeline_actions.GitHubTrigger.WEBHOOK,
                 output: sourceOutput,
-                actionName: 'Clone aws-weather-app repo'
+                actionName: 'Clone_aws-weather-app_repo'
               }),
           ],
         },

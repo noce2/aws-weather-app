@@ -1,6 +1,6 @@
 import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as lambda from '@aws-cdk/aws-lambda';
-import { App, Stack, StackProps } from '@aws-cdk/core';
+import { App, CfnOutput, Stack, StackProps } from '@aws-cdk/core';
       
 export class LambdaStack extends Stack {
   public readonly lambdaCode: lambda.CfnParametersCode;
@@ -15,6 +15,11 @@ export class LambdaStack extends Stack {
       handler: 'index.main',
       runtime: lambda.Runtime.NODEJS_10_X,
     });
+
+    new CfnOutput(this, 'testoutputvars', {
+      exportName: 'myTestLambdaCfnKey',
+      value: 'myTestLambdaCfnVar'
+    })
       
     const alias = new lambda.Alias(this, 'LambdaAlias', {
       aliasName: 'Prod',

@@ -11,9 +11,9 @@ const Handlebars = require("handlebars");
 const templateString = (
 `
 export const environment = {
-  production: true,
-  apiUrl: '{{url}}'
-}
+    production: true,
+    apiUrl: '{{url}}'
+};
 `
 );
 const template = Handlebars.compile(templateString);

@@ -34,7 +34,7 @@ export class LambdaStack extends Stack {
     api.root.addMethod("GET", getWeatherLambdaIntegration)
 
     new CfnOutput(this, 'apiurl', {
-      exportName: 'url',
+      exportName: 'AwsWeatherAppApiUrl',
       value: api.url
     })
       

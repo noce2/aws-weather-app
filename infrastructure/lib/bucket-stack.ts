@@ -22,7 +22,7 @@ export class BucketCdkStack extends core.Stack {
             value: bucket.bucketWebsiteUrl
         });
 
-        this.BucketArn = new CfnOutput(this, 'StaticSiteUrl', {
+        this.BucketArn = new CfnOutput(this, 'BucketArn', {
             exportName: 'AwsWeatherAppWebUiUrl',
             value: bucket.bucketArn
         });

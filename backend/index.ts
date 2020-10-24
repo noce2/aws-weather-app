@@ -7,6 +7,9 @@ export const main: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, 
   console.log(GREETING);
   return {
     statusCode: 200,
-    body: GREETING
+    body: GREETING,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
   };
 }

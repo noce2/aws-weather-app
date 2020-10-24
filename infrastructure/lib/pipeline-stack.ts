@@ -204,14 +204,13 @@ export class PipelineStack extends Stack {
               templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
               stackName: 'WebUIDeploymentStack',
               adminPermissions: true,
-              output: webStackCftOutput,
-              outputFileName: 'cftoutputs'
+              variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
             }),
             new codepipeline_actions.S3DeployAction({
               actionName: 'WebUI_Code_Upload',
               input: webUIBuildOutput,
-              bucket: Bucket.fromBucketName(this, 'noce2-dev-aws-weather-app-webui-bucket', 
-              webStackCftOutput.getParam('cftoutputs','BucketArn'))
+              bucket: Bucket.fromBucketArn(this, 'noce2-dev-aws-weather-app-webui-bucket', 
+              '#{WebUI_CFN_Deploy_Namespace.BucketArn}')
             })
           ],
         },

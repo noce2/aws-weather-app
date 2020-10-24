@@ -1,3 +1,4 @@
+import * as apigateway from '@aws-cdk/aws-apigateway';
 import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as lambda from '@aws-cdk/aws-lambda';
 import { App, CfnOutput, Stack, StackProps } from '@aws-cdk/core';
@@ -19,6 +20,22 @@ export class LambdaStack extends Stack {
     new CfnOutput(this, 'testoutputvars', {
       exportName: 'myTestLambdaCfnKey',
       value: 'myTestLambdaCfnVar'
+    })
+
+    const api = new apigateway.RestApi(this, "AwsWeatherAppApi", {
+      restApiName: "AWS Weather App Api",
+      description: "Serves the weather for a location."
+    });
+
+    const getWeatherLambdaIntegration = new apigateway.LambdaIntegration(func, {
+      proxy: true
+    });
+
+    api.root.addMethod("GET", getWeatherLambdaIntegration)
+
+    new CfnOutput(this, 'apiurl', {
+      exportName: 'url',
+      value: api.url
     })
       
     const alias = new lambda.Alias(this, 'LambdaAlias', {

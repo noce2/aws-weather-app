@@ -71,6 +71,7 @@ export class PipelineStack extends Stack {
           'base-directory': 'infrastructure/dist',
           files: [
             'LambdaStack.template.json',
+            'WebUIStack.template.json'
           ],
         },
       }),
@@ -108,6 +109,7 @@ export class PipelineStack extends Stack {
     const sourceOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
     const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
+
     new codepipeline.Pipeline(this, 'Pipeline', {
       stages: [
         {
@@ -157,6 +159,12 @@ export class PipelineStack extends Stack {
               },
               extraInputs: [lambdaBuildOutput],
             }),
+            new codepipeline_actions.CloudFormationCreateUpdateStackAction({
+              actionName: 'WebUI_CFN_Deploy',
+              templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
+              stackName: 'WebUIDeploymentStack',
+              adminPermissions: true
+            })
           ],
         },
       ],

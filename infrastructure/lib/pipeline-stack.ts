@@ -6,6 +6,7 @@ import * as kms from '@aws-cdk/aws-kms';
 import * as s3 from '@aws-cdk/aws-s3';
 import { App, Stack, StackProps, SecretValue, RemovalPolicy } from '@aws-cdk/core';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
+import { Bucket } from '@aws-cdk/aws-s3';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -105,12 +106,45 @@ export class PipelineStack extends Stack {
         buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
       },
     });
+    const webUIBuild = new codebuild.PipelineProject(this, 'WebUIBuild', {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            commands: [
+              'cd web-app',
+              'npm install',
+            ],
+          },
+          build: {
+            commands: [
+              'npm run-script configure-environment-url -- --url https://ydple4g6hi.execute-api.eu-west-2.amazonaws.com/prod/ --configuration production',
+              'npm run build:prod',
+            ],
+          },
+        },
+        artifacts: {
+          'base-directory': 'web-app/dist/web-app',
+          files: [
+            'index.html',
+            'favicon.ico',
+            '*.js',
+            '*.js.map'
+          ],
+        },
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
+      },
+    });
 
     const sourceOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
     const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
+    const webUIBuildOutput = new codepipeline.Artifact('WebUIBuildOutput');
+    const webStackCftOutput = new codepipeline.Artifact('WebStackDeployCftOutput');
 
-    new codepipeline.Pipeline(this, 'Pipeline', {
+    const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
       stages: [
         {
           stageName: 'Source',
@@ -139,6 +173,12 @@ export class PipelineStack extends Stack {
               outputs: [lambdaBuildOutput],
             }),
             new codepipeline_actions.CodeBuildAction({
+              actionName: 'WebUI_Build',
+              project: webUIBuild,
+              input: sourceOutput,
+              outputs: [webUIBuildOutput],
+            }),
+            new codepipeline_actions.CodeBuildAction({
               actionName: 'CDK_Build',
               project: cdkBuild,
               input: sourceOutput,
@@ -163,7 +203,15 @@ export class PipelineStack extends Stack {
               actionName: 'WebUI_CFN_Deploy',
               templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
               stackName: 'WebUIDeploymentStack',
-              adminPermissions: true
+              adminPermissions: true,
+              output: webStackCftOutput,
+              outputFileName: 'cftoutputs'
+            }),
+            new codepipeline_actions.S3DeployAction({
+              actionName: 'WebUI_Code_Upload',
+              input: webUIBuildOutput,
+              bucket: Bucket.fromBucketName(this, 'noce2-dev-aws-weather-app-webui-bucket', 
+              webStackCftOutput.getParam('cftoutputs','BucketArn'))
             })
           ],
         },

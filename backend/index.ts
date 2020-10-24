@@ -3,11 +3,13 @@ import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult, Ca
 // index.ts
 const GREETING = "Hello, AWS!";
 
-export const main: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>) => {
+export const main: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, context: Context) => {
   console.log(GREETING);
   return {
     statusCode: 200,
-    body: GREETING,
+    body: JSON.stringify({
+      greeting: GREETING
+    }),
     headers: {
       'Access-Control-Allow-Origin': '*'
     }

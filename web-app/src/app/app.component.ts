@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { BehaviorSubject, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -11,15 +11,17 @@ import { environment } from 'src/environments/environment';
 export class AppComponent {
   title = 'web-app';
   temperatureSubject = new BehaviorSubject('');
-  dataReturned = this.temperatureSubject.value;
+  dataReturned = this.temperatureSubject.asObservable();
   constructor(private http: HttpClient) {
     http.get<string>(environment.apiUrl).subscribe({
-      next: (value) => this.temperatureSubject.next((value)),
+      next: (value) => {
+        this.temperatureSubject.next((JSON.stringify(value)));
+      },
       error: this.handleError
     });
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: HttpErrorResponse): Observable<never> {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);

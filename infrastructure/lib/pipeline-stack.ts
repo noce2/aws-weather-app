@@ -7,6 +7,7 @@ import * as s3 from '@aws-cdk/aws-s3';
 import { App, Stack, StackProps, SecretValue, RemovalPolicy } from '@aws-cdk/core';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Bucket } from '@aws-cdk/aws-s3';
+import { VariableExposedCloudFormationCreateUpdateStackAction } from './custom-cft-action';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -144,6 +145,14 @@ export class PipelineStack extends Stack {
     const webUIBuildOutput = new codepipeline.Artifact('WebUIBuildOutput');
     const webStackCftOutput = new codepipeline.Artifact('WebStackDeployCftOutput');
 
+    const webUiCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
+      actionName: 'WebUI_CFN_Deploy',
+      templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
+      stackName: 'WebUIDeploymentStack',
+      adminPermissions: true,
+      variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
+    });
+
     const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
       stages: [
         {
@@ -199,18 +208,13 @@ export class PipelineStack extends Stack {
               },
               extraInputs: [lambdaBuildOutput],
             }),
-            new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-              actionName: 'WebUI_CFN_Deploy',
-              templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
-              stackName: 'WebUIDeploymentStack',
-              adminPermissions: true,
-              variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
-            }),
+            webUiCftDeployAction
+            ,
             new codepipeline_actions.S3DeployAction({
               actionName: 'WebUI_Code_Upload',
               input: webUIBuildOutput,
               bucket: Bucket.fromBucketArn(this, 'noce2-dev-aws-weather-app-webui-bucket', 
-              '#{WebUI_CFN_Deploy_Namespace.BucketArn}')
+              webUiCftDeployAction.retireveNamespaceVariable('BucketArn'))
             })
           ],
         },

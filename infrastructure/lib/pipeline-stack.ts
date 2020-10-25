@@ -8,6 +8,7 @@ import { App, Stack, StackProps, SecretValue, RemovalPolicy } from '@aws-cdk/cor
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { VariableExposedCloudFormationCreateUpdateStackAction } from './custom-cft-action';
+import { BucketCdkStack } from './bucket-stack';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -213,8 +214,7 @@ export class PipelineStack extends Stack {
             new codepipeline_actions.S3DeployAction({
               actionName: 'WebUI_Code_Upload',
               input: webUIBuildOutput,
-              bucket: Bucket.fromBucketArn(this, 'noce2-dev-aws-weather-app-webui-bucket', 
-              webUiCftDeployAction.retireveNamespaceVariable('BucketArn'))
+              bucket: (app.node.findChild('WebUIStack') as BucketCdkStack).stackBucket
             })
           ],
         },

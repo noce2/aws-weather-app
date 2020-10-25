@@ -1,11 +1,12 @@
 import * as core from '@aws-cdk/core';
 import * as s3 from '@aws-cdk/aws-s3';
-import { BlockPublicAccess } from '@aws-cdk/aws-s3';
+import { BlockPublicAccess, Bucket } from '@aws-cdk/aws-s3';
 import { CfnOutput } from '@aws-cdk/core';
 
 export class BucketCdkStack extends core.Stack {
     public readonly StaticSiteUrl: CfnOutput
     public readonly BucketArn: CfnOutput
+    public readonly stackBucket: Bucket
 
     constructor(scope: core.App, id: string, props?: core.StackProps) {
         super(scope, id, props);
@@ -26,5 +27,7 @@ export class BucketCdkStack extends core.Stack {
             exportName: 'AwsWeatherAppWebBucketArn',
             value: bucket.bucketArn
         });
+
+        this.stackBucket = bucket;
     }
 }

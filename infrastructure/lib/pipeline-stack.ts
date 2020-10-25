@@ -108,6 +108,32 @@ export class PipelineStack extends Stack {
         buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
       },
     });
+
+    const sourceOutput = new codepipeline.Artifact();
+    const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
+    const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
+    const webUIBuildOutput = new codepipeline.Artifact('WebUIBuildOutput');
+    const webStackCftOutput = new codepipeline.Artifact('WebStackDeployCftOutput');
+
+    const webUiCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
+      actionName: 'WebUI_CFN_Deploy',
+      templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
+      stackName: 'WebUIStack',
+      adminPermissions: true,
+      variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
+    });
+    const lambdaCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
+      actionName: 'Lambda_CFN_Deploy',
+      templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
+      stackName: 'LambdaDeploymentStack',
+      adminPermissions: true,
+      parameterOverrides: {
+        ...props.lambdaCode.assign(lambdaBuildOutput.s3Location),
+      },
+      extraInputs: [lambdaBuildOutput],
+      variablesNamespace: 'Lambda_CFN_Deploy_Namespace'
+    });
+
     const webUIBuild = new codebuild.PipelineProject(this, 'WebUIBuild', {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
@@ -120,7 +146,7 @@ export class PipelineStack extends Stack {
           },
           build: {
             commands: [
-              'npm run-script configure-environment-url -- --url https://ydple4g6hi.execute-api.eu-west-2.amazonaws.com/prod/ --configuration production',
+              'npm run-script configure-environment-url -- --url ${BackendLambdaUrl} --configuration production',
               'npm run build:prod',
             ],
           },
@@ -138,20 +164,9 @@ export class PipelineStack extends Stack {
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
       },
-    });
-
-    const sourceOutput = new codepipeline.Artifact();
-    const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
-    const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
-    const webUIBuildOutput = new codepipeline.Artifact('WebUIBuildOutput');
-    const webStackCftOutput = new codepipeline.Artifact('WebStackDeployCftOutput');
-
-    const webUiCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
-      actionName: 'WebUI_CFN_Deploy',
-      templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
-      stackName: 'WebUIStack',
-      adminPermissions: true,
-      variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
+      environmentVariables: {
+        BackendLambdaUrl: { value: lambdaCftDeployAction.retireveNamespaceVariable('apiurl')}
+      }
     });
 
     const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
@@ -174,7 +189,7 @@ export class PipelineStack extends Stack {
           ],
         },
         {
-          stageName: 'Build',
+          stageName: 'Build_Lambda_Source_and_CDK_Apps',
           actions: [
             new codepipeline_actions.CodeBuildAction({
               actionName: 'Lambda_Build',
@@ -183,41 +198,41 @@ export class PipelineStack extends Stack {
               outputs: [lambdaBuildOutput],
             }),
             new codepipeline_actions.CodeBuildAction({
-              actionName: 'WebUI_Build',
-              project: webUIBuild,
-              input: sourceOutput,
-              outputs: [webUIBuildOutput],
-            }),
-            new codepipeline_actions.CodeBuildAction({
               actionName: 'CDK_Build',
               project: cdkBuild,
               input: sourceOutput,
               outputs: [cdkBuildOutput],
-            }),
+            })
           ],
         },
         {
-          stageName: 'Deploy',
+          stageName: 'Deploy_Lambda_Infra_and_Web_App_Infra',
           actions: [
-            new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-              actionName: 'Lambda_CFN_Deploy',
-              templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
-              stackName: 'LambdaDeploymentStack',
-              adminPermissions: true,
-              parameterOverrides: {
-                ...props.lambdaCode.assign(lambdaBuildOutput.s3Location),
-              },
-              extraInputs: [lambdaBuildOutput],
-            }),
-            webUiCftDeployAction
-            ,
+            lambdaCftDeployAction,
+            webUiCftDeployAction,
+          ],
+        },
+        {
+          stageName: 'Build_Web_App_Source_Code',
+          actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'WebUI_Build',
+              project: webUIBuild,
+              input: sourceOutput,
+              outputs: [webUIBuildOutput],
+            })
+          ],
+        },
+        {
+          stageName: 'Deploy_Web_App_Source_Code',
+          actions: [
             new codepipeline_actions.S3DeployAction({
               actionName: 'WebUI_Code_Upload',
               input: webUIBuildOutput,
               bucket: (app.node.findChild('WebUIStack') as BucketCdkStack).stackBucket
             })
           ],
-        },
+        }
       ],
       artifactBucket: pipelineArtifactsBucket
     });

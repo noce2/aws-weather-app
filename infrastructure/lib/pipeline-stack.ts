@@ -157,7 +157,8 @@ export class PipelineStack extends Stack {
             'index.html',
             'favicon.ico',
             '*.js',
-            '*.js.map'
+            '*.js.map',
+            '*.css'
           ],
         },
       }),

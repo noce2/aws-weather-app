@@ -25,5 +25,8 @@ const lambdaStack = new LambdaStack(app, 'LambdaStack', {
 
 new PipelineStack(app, 'PipelineDeployingLambdaStack', {
     lambdaCode: lambdaStack.lambdaCode,
-    repoName: 'aws-weather-app'
+    repoName: 'aws-weather-app',
+    env: {
+        region: 'eu-west-2'
+    }
 })

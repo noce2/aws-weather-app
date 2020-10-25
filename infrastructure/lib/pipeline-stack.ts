@@ -149,7 +149,7 @@ export class PipelineStack extends Stack {
     const webUiCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
       actionName: 'WebUI_CFN_Deploy',
       templatePath: cdkBuildOutput.atPath('WebUIStack.template.json'),
-      stackName: 'WebUIDeploymentStack',
+      stackName: 'WebUIStack',
       adminPermissions: true,
       variablesNamespace: 'WebUI_CFN_Deploy_Namespace'
     });

@@ -164,9 +164,6 @@ export class PipelineStack extends Stack {
       }),
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
-      },
-      environmentVariables: {
-        BackendLambdaUrl: { value: lambdaCftDeployAction.retireveNamespaceVariable('apiurl')}
       }
     });
 
@@ -221,6 +218,9 @@ export class PipelineStack extends Stack {
               project: webUIBuild,
               input: sourceOutput,
               outputs: [webUIBuildOutput],
+              environmentVariables: {
+                BackendLambdaUrl: { value: lambdaCftDeployAction.retireveNamespaceVariable('apiurl') }
+              }
             })
           ],
         },

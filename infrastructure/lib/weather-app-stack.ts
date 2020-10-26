@@ -7,7 +7,7 @@ export class WeatherAppStack extends Stack {
         super(app, id, props);
     
         const weatherAppSiteCfnOutput = new CfnOutput(this, 'apiurl', {
-          exportName: 'AwsWeatherAppApiUrl',
+          exportName: 'WeatherAppApiUrl',
           value: 'espérate, ya voy'
         })
         this.weatherAppSiteCfnOutput = weatherAppSiteCfnOutput;

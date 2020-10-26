@@ -1,0 +1,19 @@
+{
+  "name": "custom-resource-provider-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": " node ./node_modules/typescript/lib/tsc.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.64",
+    "@types/node": "^14.14.2",
+    "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "cfn-lambda": "^4.0.0"
+  }
+}

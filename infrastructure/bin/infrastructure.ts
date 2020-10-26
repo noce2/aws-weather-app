@@ -10,16 +10,17 @@ const app = new cdk.App();
 const weatherAppStackName = 'WeatherAppStack';
 const weatherAppCustomResourceProviderStackName = WeatherAppCustomResourceProviderStack.name;
 
-new WeatherAppStack(app, weatherAppStackName, {
+const weatherAppCustomResourceProviderStack = new WeatherAppCustomResourceProviderStack(app, weatherAppCustomResourceProviderStackName, {
     env: {
         region: 'eu-west-2'
     }
 });
 
-const weatherAppCustomResourceProviderStack = new WeatherAppCustomResourceProviderStack(app, weatherAppCustomResourceProviderStackName, {
+new WeatherAppStack(app, weatherAppStackName, {
     env: {
         region: 'eu-west-2'
-    }
+    },
+    customResourceProviderArn: weatherAppCustomResourceProviderStack.providerArn
 });
 
 new WeatherAppStackDeploymentPipelineStack(app, 'WeatherAppStackDeploymentPipelineStack', {

@@ -6,6 +6,7 @@ import { WeatherAppCustomResourceProviderStack } from "./weather-app-custom-reso
 export interface WeatherAppCustomResourceProps {
     readonly addBucket: boolean;
     readonly deployLambdaAndGateway: boolean;
+    readonly providerArnServiceToken: string;
 }
 export class WeatherAppCustomResource extends Construct {
     public readonly weatherAppUiSiteBucket: Bucket;
@@ -13,9 +14,8 @@ export class WeatherAppCustomResource extends Construct {
     constructor(scope: Construct, id: string, props: WeatherAppCustomResourceProps) {
         super(scope, id);
 
-        console.log(JSON.stringify(scope.node.root.node.uniqueId))
         this.underlyingCustomResource = new CustomResource(this, 'WeatherAppCustomResource', {
-            serviceToken: 'arn:aws:lambda:eu-west-2:892799438830:function:WeatherAppCustomResourceP-WeatherAppCustomResource-ACS0N55V7N2F'
+            serviceToken: props.providerArnServiceToken
         })
     }
 }

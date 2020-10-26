@@ -1,11 +1,10 @@
 import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as lambda from '@aws-cdk/aws-lambda';
 import { App, CfnOutput, Duration, Stack, StackProps } from '@aws-cdk/core';
-import { Provider } from '@aws-cdk/custom-resources';
       
 export class WeatherAppCustomResourceProviderStack extends Stack {
   public readonly lambdaCode: lambda.CfnParametersCode;
-  public readonly provider: Provider
+  public readonly providerArn: string
       
   constructor(app: App, id: string, props?: StackProps) {
     super(app, id, props);
@@ -18,6 +17,8 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
       runtime: lambda.Runtime.PYTHON_3_8,
       timeout: Duration.seconds(900)
     });
+    
+    this.providerArn = func.functionArn;
 
     new CfnOutput(this, 'functionArn', {
       exportName: 'WeatherAppCustomResourceProviderArn',

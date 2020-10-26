@@ -11,7 +11,7 @@ def create(event, context):
     logger.info("Got create handler!")
     logger.info(f'Request id is: {event["RequestId"]}')
     if (("ResourceProperties" in event) and "AddBucket" in event['ResourceProperties']):
-        if (event["ResourceProperties"]["AddBucket"] == True):
+        if (event["ResourceProperties"]["AddBucket"] == True or event["ResourceProperties"]["AddBucket"] == "True"):
             return 'somestuff'
         else:
             return 'someotherstuffstuff'

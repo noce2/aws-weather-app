@@ -89,7 +89,7 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
 
     const noce2WeatherAppStackCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
       actionName: 'WeatherAppStack_CFN_Deploy',
-      templatePath: cdkBuildOutput.atPath(`${props.weatherAppStackName}.template.json`), // TODO Replace stack template name
+      templatePath: cdkBuildOutput.atPath(`${props.weatherAppStackName}.template.json`),
       stackName: `${props.weatherAppStackName}`,
       adminPermissions: true,
       variablesNamespace: 'WeatherAppStack_CFN_Deploy_Namespace'

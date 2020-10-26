@@ -94,18 +94,15 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
           install: {
             commands: [
               'cd custom-resource-provider-lambda',
-              'npm install',
+              'pip install -r requirements.txt -t lib',
             ],
-          },
-          build: {
-            commands: 'npm run build',
-          },
+          }
         },
         artifacts: {
           'base-directory': 'custom-resource-provider-lambda',
           files: [
-            'index.js',
-            'node_modules/**/*',
+            '*.py',
+            'lib/**/*',
           ],
         },
       }),

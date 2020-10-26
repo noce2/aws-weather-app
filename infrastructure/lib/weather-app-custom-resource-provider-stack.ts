@@ -15,7 +15,7 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
     const func = new lambda.Function(this, 'WeatherAppCustomResourceProviderLambda', {
       code: this.lambdaCode,
       handler: 'index.main',
-      runtime: lambda.Runtime.NODEJS_10_X,
+      runtime: lambda.Runtime.PYTHON_3_8,
       timeout: Duration.seconds(900)
     });
 

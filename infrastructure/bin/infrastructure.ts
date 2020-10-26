@@ -2,6 +2,7 @@
 import * as cdk from '@aws-cdk/core';
 import { WeatherAppStackDeploymentPipelineStack } from '../lib/weather-app-stack-deployment-pipeline-stack';
 import { LambdaStack } from '../lib/lambda-stack';
+import { WeatherAppStack } from '../lib/weather-app-stack';
 
 const app = new cdk.App();
 const lambdaStack = new LambdaStack(app, 'LambdaStack', {
@@ -11,6 +12,12 @@ const lambdaStack = new LambdaStack(app, 'LambdaStack', {
 });
 
 const weatherAppStackName = 'WeatherAppStack';
+
+new WeatherAppStack(app, weatherAppStackName, {
+    env: {
+        region: 'eu-west-2'
+    }
+});
 
 new WeatherAppStackDeploymentPipelineStack(app, 'WeatherAppStackDeploymentPipelineStack', {
     repoName: 'aws-weather-app',

@@ -9,11 +9,14 @@ import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { VariableExposedCloudFormationCreateUpdateStackAction } from './custom-cft-action';
 import { BucketCdkStack } from './bucket-stack';
+import { CfnParametersCode } from '@aws-cdk/aws-lambda';
 
 export interface WeatherAppStackDeploymentPipelineStackProps extends StackProps {
   readonly repoName: string
   readonly branch: string;
   readonly weatherAppStackName: string;
+  readonly weatherAppCustomerProviderLambdaCode: CfnParametersCode
+  readonly weatherAppCustomResourceProviderStackName: string
 }
 
 export class WeatherAppStackDeploymentPipelineStack extends Stack {
@@ -83,9 +86,35 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
         buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
       },
     });
-
+    const lambdaBuild = new codebuild.PipelineProject(this, 'WeatherAppCustomResourceProviderLambdaBuild', {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            commands: [
+              'cd custom-resource-provider-lambda',
+              'npm install',
+            ],
+          },
+          build: {
+            commands: 'npm run build',
+          },
+        },
+        artifacts: {
+          'base-directory': 'custom-resource-provider-lambda',
+          files: [
+            'index.js',
+            'node_modules/**/*',
+          ],
+        },
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_2_0,
+      },
+    });
     const sourceOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
+    const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
 
     const noce2WeatherAppStackCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
       actionName: 'WeatherAppStack_CFN_Deploy',
@@ -93,6 +122,18 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
       stackName: `${props.weatherAppStackName}`,
       adminPermissions: true,
       variablesNamespace: 'WeatherAppStack_CFN_Deploy_Namespace'
+    });
+
+    const lambdaCftDeployAction = new VariableExposedCloudFormationCreateUpdateStackAction({
+      actionName: 'WeatherAppStackCustomResourceProviderLambda_CFN_Deploy',
+      templatePath: cdkBuildOutput.atPath(`${props.weatherAppCustomResourceProviderStackName}.template.json`),
+      stackName: props.weatherAppCustomResourceProviderStackName,
+      adminPermissions: true,
+      parameterOverrides: {
+        ...props.weatherAppCustomerProviderLambdaCode.assign(lambdaBuildOutput.s3Location),
+      },
+      extraInputs: [lambdaBuildOutput],
+      variablesNamespace: 'Lambda_CFN_Deploy_Namespace'
     });
 
     const pipeline = new codepipeline.Pipeline(this, 'WeatherAppStackDeploymentPipeline', {
@@ -115,14 +156,26 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
           ],
         },
         {
-          stageName: 'Build_CDK_Apps',
+          stageName: 'Build_Provider_Lambda_Source_and_CDK_Apps',
           actions: [
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Lambda_Build',
+              project: lambdaBuild,
+              input: sourceOutput,
+              outputs: [lambdaBuildOutput],
+            }),
             new codepipeline_actions.CodeBuildAction({
               actionName: 'CDK_Build',
               project: cdkBuild,
               input: sourceOutput,
               outputs: [cdkBuildOutput],
             })
+          ],
+        },
+        {
+          stageName: 'Deploy_Custom_Provider_Stack',
+          actions: [
+            lambdaCftDeployAction
           ],
         },
         {

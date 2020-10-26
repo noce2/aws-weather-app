@@ -78,7 +78,8 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
         artifacts: {
           'base-directory': 'infrastructure/dist',
           files: [
-            `${props.weatherAppStackName}.template.json`
+            `${props.weatherAppStackName}.template.json`,
+            `${props.weatherAppCustomResourceProviderStackName}.template.json`
           ],
         },
       }),

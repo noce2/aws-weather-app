@@ -13,9 +13,10 @@ def create(event, context):
     if (event["ResourceProperties"] == True):
         return 'somestuff'
 
+@helper.delete
+def delete(event, context):
+    # We do nothing for now.
+    return
 
 def main(event, context):
-    return {
-        'statusCode': 200,
-        'body': 'Lambda was invoked successfully.'
-    }
+    helper(event, context)

@@ -1,6 +1,6 @@
 import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as lambda from '@aws-cdk/aws-lambda';
-import { App, CfnOutput, Stack, StackProps } from '@aws-cdk/core';
+import { App, CfnOutput, Duration, Stack, StackProps } from '@aws-cdk/core';
 import { Provider } from '@aws-cdk/custom-resources';
       
 export class WeatherAppCustomResourceProviderStack extends Stack {
@@ -16,6 +16,7 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
       code: this.lambdaCode,
       handler: 'index.main',
       runtime: lambda.Runtime.NODEJS_10_X,
+      timeout: Duration.seconds(900)
     });
 
     new CfnOutput(this, 'functionArn', {

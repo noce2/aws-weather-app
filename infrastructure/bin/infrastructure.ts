@@ -4,7 +4,6 @@ import { WeatherAppStackDeploymentPipelineStack } from '../lib/weather-app-stack
 import { LambdaStack } from '../lib/lambda-stack';
 import { WeatherAppStack } from '../lib/weather-app-stack';
 import { WeatherAppCustomResourceProviderStack } from '../lib/weather-app-custom-resource-provider-stack';
-import { WeatherAppCustomResource } from '../lib/weather-app-custom-resource';
 
 const app = new cdk.App();
 

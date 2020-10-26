@@ -10,12 +10,13 @@ helper = CfnResource(json_logging=False, log_level='DEBUG', boto_level='CRITICAL
 def create(event, context):
     logger.info("Got create handler!")
     logger.info(f'Request id is: {event["RequestId"]}')
-    if (event["ResourceProperties"]["AddBucket"] == True):
-        return 'somestuff'
-    elif (event["ResourceProperties"]["AddBucket"] == False):
-        return 'someotherstuffstuff'
+    if (("ResourceProperties" in event) and "AddBucket" in event['ResourceProperties']):
+        if (event["ResourceProperties"]["AddBucket"] == True):
+            return 'somestuff'
+        else:
+            return 'someotherstuffstuff'
     else:
-        raise RuntimeError("Something went wrong")
+        raise RuntimeError(f'AddBucket property not present. Instead found: {event["ResourceProperties"]}')
 
 @helper.delete
 def delete(event, context):

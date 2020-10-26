@@ -94,7 +94,7 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
           install: {
             commands: [
               'cd custom-resource-provider-lambda',
-              'pip install -r requirements.txt -t lib',
+              'pip install -r requirements.txt -t ./',
             ],
           }
         },
@@ -102,7 +102,7 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
           'base-directory': 'custom-resource-provider-lambda',
           files: [
             '*.py',
-            'lib/**/*',
+            '**/*',
           ],
         },
       }),

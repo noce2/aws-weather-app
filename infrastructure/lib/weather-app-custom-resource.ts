@@ -15,7 +15,11 @@ export class WeatherAppCustomResource extends Construct {
         super(scope, id);
 
         this.underlyingCustomResource = new CustomResource(this, 'WeatherAppCustomResource', {
-            serviceToken: props.providerArnServiceToken
+            serviceToken: props.providerArnServiceToken,
+            properties: {
+                AddBucket: props.addBucket,
+                DeployLambdaAndGateway: props.deployLambdaAndGateway
+            }
         })
     }
 }

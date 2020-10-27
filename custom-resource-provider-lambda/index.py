@@ -26,6 +26,10 @@ def create(event, context):
                             'ParameterKey': 'CdkAndAppSourceBranchToTrack',
                             'ParameterValue': event["ResourceProperties"][CUSTOM_RESOURCE_PROP_TO_CHECK]
                         },
+                        {
+                            'ParameterKey': 'IamUserToAllowKeyMolicyManagement',
+                            'ParameterValue': 'arn:aws:iam::892799438830:role/WeatherAppCustomResourceP-WeatherAppCustomResource-1OPPB682I99H1'
+                        },
                     ],
                     TimeoutInMinutes=13,
                     Capabilities=[

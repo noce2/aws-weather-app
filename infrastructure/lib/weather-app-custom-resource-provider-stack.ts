@@ -50,7 +50,7 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
       ]
     });
 
-    const policyForKmsOperation= new PolicyStatement({
+    const policyForKmsAndSecretsOperations= new PolicyStatement({
       sid: 'allowCustomResourceProviderAccessToKms',
       effect: Effect.ALLOW,
       resources: [
@@ -68,7 +68,11 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
         "kms:UntagResource",
         "iam:ListGroups",
         "iam:ListRoles",
-        "iam:ListUsers"
+        "iam:ListUsers",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetResourcePolicy"
       ]
     });
 
@@ -95,7 +99,7 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
     });
 
     func.addToRolePolicy(policyForCftAndCodeBuildManagement);
-    func.addToRolePolicy(policyForKmsOperation);
+    func.addToRolePolicy(policyForKmsAndSecretsOperations);
     func.addToRolePolicy(policyForS3Operation);
     func.addToRolePolicy(policyForIamRoleCreation);
   }

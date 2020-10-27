@@ -23,7 +23,7 @@ def create(event, context):
                     TemplateBody=json.dumps(json.load(pipelineTemplate)),
                     Parameters=[
                         {
-                            'ParameterKey': 'BranchToTrackForAppSource',
+                            'ParameterKey': 'CdkAndAppSourceBranchToTrack',
                             'ParameterValue': event["ResourceProperties"][CUSTOM_RESOURCE_PROP_TO_CHECK]
                         },
                     ],

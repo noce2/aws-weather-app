@@ -24,6 +24,10 @@ export class PipelineStack extends Stack {
       noEcho: false
     });
 
+    const templateDeployerRole = new CfnParameter(this, 'IamUserToAllowKeyMolicyManagement', {
+      noEcho: false
+    });
+
     const keyPolicy = new PolicyStatement({
       sid: 'allow user access to update key policies',
       effect: Effect.ALLOW,
@@ -46,6 +50,7 @@ export class PipelineStack extends Stack {
       ]
     })
     keyPolicy.addArnPrincipal('arn:aws:iam::892799438830:user/noce2-dev')
+    keyPolicy.addArnPrincipal(templateDeployerRole.valueAsString);
 
     const key = new kms.Key(this, 'CustomPipelineArtifactsBucketKey', {
       removalPolicy: RemovalPolicy.DESTROY

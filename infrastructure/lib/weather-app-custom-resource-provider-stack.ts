@@ -36,14 +36,17 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
       deploymentConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE,
     });
 
-    const policyForCftManagement= new PolicyStatement({
-      sid: 'allowCustomResourceProviderAccessToCloudFormation',
+    const policyForCftAndCodeBuildManagement= new PolicyStatement({
+      sid: 'allowCustomResourceProviderAccessToCFNAndCodeTools',
       effect: Effect.ALLOW,
       resources: [
         "*"
       ],
       actions: [
-        "cloudformation:*"
+        "cloudformation:*",
+        "codebuild:*",
+        "codedeploy:*",
+        "codepipeline:*"
       ]
     });
 
@@ -91,7 +94,7 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
       ]
     });
 
-    func.addToRolePolicy(policyForCftManagement);
+    func.addToRolePolicy(policyForCftAndCodeBuildManagement);
     func.addToRolePolicy(policyForKmsOperation);
     func.addToRolePolicy(policyForS3Operation);
     func.addToRolePolicy(policyForIamRoleCreation);

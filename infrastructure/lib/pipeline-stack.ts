@@ -4,7 +4,7 @@ import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as kms from '@aws-cdk/aws-kms';
 import * as s3 from '@aws-cdk/aws-s3';
-import { App, Stack, StackProps, SecretValue, RemovalPolicy } from '@aws-cdk/core';
+import { App, Stack, StackProps, SecretValue, RemovalPolicy, CfnParameter } from '@aws-cdk/core';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { VariableExposedCloudFormationCreateUpdateStackAction } from './custom-cft-action';
@@ -18,6 +18,11 @@ export interface PipelineStackProps extends StackProps {
 export class PipelineStack extends Stack {
   constructor(app: App, id: string, props: PipelineStackProps) {
     super(app, id, props);
+
+    const branchToTrack = new CfnParameter(this, 'CdkAndAppSourceBranchToTrack', {
+      default: 'main',
+      noEcho: false
+    });
 
     const keyPolicy = new PolicyStatement({
       sid: 'allow user access to update key policies',
@@ -173,7 +178,7 @@ export class PipelineStack extends Stack {
           stageName: 'Source',
           actions: [
             new codepipeline_actions.GitHubSourceAction({
-                branch: 'main',
+                branch: branchToTrack.valueAsString,
                 owner: 'noce2',
                 repo: props.repoName,
                 oauthToken: SecretValue.secretsManager(

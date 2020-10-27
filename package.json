@@ -18,6 +18,7 @@
   "homepage": "https://github.com/noce2/aws-weather-app#readme",
   "devDependencies": {
     "@angular/cli": "^10.1.7",
-    "aws-cdk": "^1.69.0"
+    "aws-cdk": "^1.69.0",
+    "yargs": "^16.1.0"
   }
 }

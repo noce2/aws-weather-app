@@ -19,7 +19,8 @@ export class WeatherAppStack extends Stack {
         const weatherAppCustomResource = new WeatherAppCustomResource(this, 'WeatherAppCustomResource', {
           addBucket: false,
           deployLambdaAndGateway: false,
-          providerArnServiceToken: props.customResourceProviderArn
+          providerArnServiceToken: props.customResourceProviderArn,
+          branchToTrackForAppSource: 'main'
         });
         this.weatherAppSiteCfnOutput = weatherAppSiteCfnOutput;
       }

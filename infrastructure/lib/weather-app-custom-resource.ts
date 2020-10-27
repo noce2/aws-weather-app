@@ -7,6 +7,7 @@ export interface WeatherAppCustomResourceProps {
     readonly addBucket: boolean;
     readonly deployLambdaAndGateway: boolean;
     readonly providerArnServiceToken: string;
+    readonly branchToTrackForAppSource: string;
 }
 export class WeatherAppCustomResource extends Construct {
     public readonly weatherAppUiSiteBucket: Bucket;
@@ -18,7 +19,8 @@ export class WeatherAppCustomResource extends Construct {
             serviceToken: props.providerArnServiceToken,
             properties: {
                 AddBucket: props.addBucket,
-                DeployLambdaAndGateway: props.deployLambdaAndGateway
+                DeployLambdaAndGateway: props.deployLambdaAndGateway,
+                BranchToTrackForAppSource: props.branchToTrackForAppSource
             }
         })
     }

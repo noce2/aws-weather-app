@@ -101,8 +101,9 @@ export class WeatherAppStackDeploymentPipelineStack extends Stack {
         artifacts: {
           'base-directory': 'custom-resource-provider-lambda',
           files: [
+            'PipelineDeployingLambdaStack.template.json',
             '*.py',
-            '**/*',
+            '**/*'
           ],
         },
       }),

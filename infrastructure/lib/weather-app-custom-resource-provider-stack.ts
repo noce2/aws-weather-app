@@ -94,5 +94,6 @@ export class WeatherAppCustomResourceProviderStack extends Stack {
     func.addToRolePolicy(policyForCftManagement);
     func.addToRolePolicy(policyForKmsOperation);
     func.addToRolePolicy(policyForS3Operation);
+    func.addToRolePolicy(policyForIamRoleCreation);
   }
 }

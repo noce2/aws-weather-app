@@ -20,7 +20,7 @@ export class WeatherAppStack extends Stack {
           addBucket: false,
           deployLambdaAndGateway: false,
           providerArnServiceToken: props.customResourceProviderArn,
-          branchToTrackForAppSource: 'main'
+          branchToTrackForAppSource: 'test-branch-2'
         });
         this.weatherAppSiteCfnOutput = weatherAppSiteCfnOutput;
       }

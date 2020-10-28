@@ -10,12 +10,12 @@ import { environment } from 'src/environments/environment';
 })
 export class AppComponent {
   title = 'web-app';
-  temperatureSubject = new BehaviorSubject('');
+  temperatureSubject = new BehaviorSubject({});
   dataReturned = this.temperatureSubject.asObservable();
   constructor(private http: HttpClient) {
-    http.get<string>(environment.apiUrl).subscribe({
+    http.get(environment.apiUrl).subscribe({
       next: (value) => {
-        this.temperatureSubject.next((JSON.stringify(value)));
+        this.temperatureSubject.next((value));
       },
       error: this.handleError
     });

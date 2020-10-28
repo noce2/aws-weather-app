@@ -77,6 +77,12 @@ def update(event, context):
 @helper.delete
 def delete(event, context):
     # We do nothing for now.
+    ## TODO Empty Pipeline artifacts bucket
+    ## TODO Delete Pipeline Stack by SuppliedId
+    ## TODO Empty WebUIStack bucket
+    ## TODO Delete WebUIStack
+    ## TODO Delete LambdaDeploymentStack
+
     return
 
 def main(event, context):

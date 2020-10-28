@@ -64,7 +64,6 @@ def update(event, context):
                             'ParameterValue': 'arn:aws:iam::892799438830:role/WeatherAppCustomResourceP-WeatherAppCustomResource-1OPPB682I99H1'
                         },
                     ],
-                    TimeoutInMinutes=13,
                     Capabilities=[
                         'CAPABILITY_NAMED_IAM',
                     ]

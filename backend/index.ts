@@ -8,7 +8,7 @@ export const main: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent, 
   console.log(GREETING);
   const response = await axios.default.get('/data/2.5/weather?q=Nottingham&appid=f8f55f720d21aa96b080dd969e2d696e',
   {
-    baseURL: 'api.openweathermap.org'
+    baseURL: 'https://api.openweathermap.org'
   });
   if(response && response.status === 200) {
     return {
